@@ -155,7 +155,7 @@ function App() {
   const [booking,setBooking]=useState(false)
   let page
   if(screen==='splash') page = <div className="flex-1 flex flex-col items-center justify-between px-8 py-10 text-center">
-    <div/><div><TimelessIcon/><div className="mt-4"><TimelessLogo/></div><p className="mt-10 text-lg font-semibold text-slate-900">L’app che valorizza<br/>il tuo tempo.</p><p className="mt-3 text-sm text-slate-500">Connetti. Organizza. Scambia. Cresci.</p></div>
+    <div/><div><div className="mt-4"><TimelessLogo/></div><p className="mt-10 text-lg font-semibold text-slate-900">L’app che valorizza<br/>il tuo tempo.</p><p className="mt-3 text-sm text-slate-500">Connetti. Organizza. Scambia. Cresci.</p></div>
     <button onClick={() => setScreen('home')} className="w-full py-4 rounded-2xl bg-violet-600 text-white font-semibold">Inizia ora</button>
   </div>
   else if(screen==='home') page=<Home setScreen={setScreen} setUser={setUser}/>
