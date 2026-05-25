@@ -1,3 +1,3 @@
-# Timeless Prototype
+# Timeless Prototype — Brand V2
 
-Prototipo cliccabile Timeless pronto per Vercel.
+Prototipo cliccabile Timeless con logo e simbolo Theta aggiornati.
