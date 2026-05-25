@@ -1,3 +1,3 @@
-# Timeless Prototype — Brand V2
+# Timeless Prototype — Definitive Logo
 
-Prototipo cliccabile Timeless con logo e simbolo Theta aggiornati.
+Prototipo cliccabile con logo Timeless e Theta importati come asset reali.
