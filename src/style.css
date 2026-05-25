@@ -1,0 +1,4 @@
+@import "tailwindcss";
+html, body, #root { min-height: 100%; margin: 0; }
+body { background: #f1f5f9; }
+button { cursor: pointer; }
