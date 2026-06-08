@@ -53,9 +53,9 @@ function Shell({children, screen, setScreen}) {
       <div className="h-full bg-[#fbfbfd] rounded-[40px] overflow-hidden flex flex-col">
         <div className="h-8 px-7 flex items-center justify-between text-[11px] font-semibold"><span>9:41</span><span>5G 🔋</span></div>
         <div className="flex-1 overflow-y-auto">{children}</div>
-        {!hideNav && <div className="h-[72px] bg-white border-t grid grid-cols-5 text-[10px]">
+        {!hideNav && <div className="h-[72px] bg-white border-t grid grid-cols-6 text-[10px]">
           {[
-            ['home','⌂','Home'],['explore','♡','Match'],['bookings','□','Prenota'],['reputation','★','Trust'],['profile','♙','Profilo']
+            ['home','⌂','Home'],['explore','♡','Match'],['bookings','□','Prenota'],['messages','💬','Chat'],['reputation','★','Trust'],['profile','♙','Profilo']
           ].map(([id,icon,label]) => <button key={id} onClick={() => setScreen(id)} className={screen===id ? 'text-violet-600' : 'text-slate-500'}><div className="text-lg">{icon}</div>{label}</button>)}
         </div>}
       </div>
