@@ -1,18 +1,4 @@
-{
-  "name": "timeless-prototype-vercel-clean",
-  "version": "1.0.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
-    "preview": "vite preview --host 0.0.0.0"
-  },
-  "dependencies": {
-    "@vitejs/plugin-react": "4.3.4",
-    "vite": "5.4.11",
-    "react": "18.3.1",
-    "react-dom": "18.3.1"
-  },
-  "devDependencies": {}
-}
+html, body, #root { min-height: 100%; margin: 0; }
+body { background: #f1f5f9; }
+button { cursor: pointer; font-family: inherit; }
+* { box-sizing: border-box; }
