@@ -32,6 +32,12 @@ const me = {
   breakdown:[['Rating utenti','38/40'],['Storico scambi','24/25'],['Affidabilità','23/25'],['Verifiche','7/10']]
 }
 
+const conversations = [
+  {name:'Giulia Bianchi', role:'Business English', avatar:'G', last:'Perfetto Giuseppe, mercoledì alle 18 va benissimo.', time:'2 min fa', unread:2, trust:94, rating:'4.9', online:true},
+  {name:'Luca Ferrari', role:'Web Design', avatar:'L', last:'Ti ho inviato una proposta per la landing page.', time:'1h fa', unread:1, trust:91, rating:'4.8', online:false},
+  {name:'Sara Conti', role:'Yoga', avatar:'S', last:'Grazie per la sessione, ti lascio subito la review.', time:'Ieri', unread:0, trust:88, rating:'4.7', online:false}
+]
+
 function Stars() { return <span className="text-amber-400 tracking-[-1px]">★★★★★</span> }
 function Pill({children, tone='violet'}) {
   const cls = tone === 'green' ? 'bg-emerald-50 text-emerald-700' : tone === 'amber' ? 'bg-amber-50 text-amber-700' : 'bg-violet-50 text-violet-700'
@@ -53,10 +59,14 @@ function Shell({children, screen, setScreen}) {
       <div className="h-full bg-[#fbfbfd] rounded-[40px] overflow-hidden flex flex-col">
         <div className="h-8 px-7 flex items-center justify-between text-[11px] font-semibold"><span>9:41</span><span>5G 🔋</span></div>
         <div className="flex-1 overflow-y-auto">{children}</div>
-        {!hideNav && <div className="h-[72px] bg-white border-t grid grid-cols-6 text-[10px]">
+        {!hideNav && <div className="h-[78px] bg-white border-t grid grid-cols-6 text-[10px] px-1">
           {[
-            ['home','⌂','Home'],['explore','♡','Match'],['bookings','□','Prenota'],['messages','💬','Chat'],['reputation','★','Trust'],['profile','♙','Profilo']
-          ].map(([id,icon,label]) => <button key={id} onClick={() => setScreen(id)} className={screen===id ? 'text-violet-600' : 'text-slate-500'}><div className="text-lg">{icon}</div>{label}</button>)}
+            ['home','⌂','Home'],['explore','♡','Match'],['messages','💬','Chat'],['wallet','Θ','Wallet'],['reputation','★','Trust'],['profile','♙','Profilo']
+          ].map(([id,icon,label]) => <button key={id} onClick={() => setScreen(id)} className={(screen===id ? 'text-violet-600' : 'text-slate-500') + ' relative flex flex-col items-center justify-center gap-1'}>
+            <div className={id==='messages' ? 'text-xl w-11 h-11 -mt-5 rounded-full bg-violet-600 text-white flex items-center justify-center shadow-lg' : 'text-lg'}>{icon}</div>
+            {id==='messages' && <span className="absolute top-1 right-5 min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[10px] flex items-center justify-center border-2 border-white">3</span>}
+            <span className={id==='messages' ? 'font-semibold text-violet-600' : ''}>{label}</span>
+          </button>)}
         </div>}
       </div>
     </div>
@@ -99,7 +109,7 @@ function Home({setScreen,setUser}) {
       <button onClick={() => setScreen('explore')} className="mt-4 bg-white text-slate-900 rounded-2xl px-4 py-3 text-sm font-semibold">Esplora servizi →</button>
     </div>
     <h3 className="mt-6 mb-3 font-semibold">Cosa vuoi fare oggi?</h3>
-    <div className="grid grid-cols-4 gap-3">{[['explore','♡','Match'],['offer','+','Offri'],['matches','⇄','Scambia'],['wallet','Θ','Wallet']].map(([s,i,l]) => <button key={s} onClick={() => setScreen(s)} className="bg-white rounded-2xl p-3 h-[82px] shadow-sm"><div className="text-2xl text-violet-600">{i}</div><span className="text-[11px]">{l}</span></button>)}</div>
+    <div className="grid grid-cols-4 gap-3">{[['explore','♡','Match'],['messages','💬','Chat'],['matches','⇄','Scambia'],['wallet','Θ','Wallet']].map(([s,i,l]) => <button key={s} onClick={() => setScreen(s)} className="bg-white rounded-2xl p-3 h-[82px] shadow-sm"><div className="text-2xl text-violet-600">{i}</div><span className="text-[11px]">{l}</span></button>)}</div>
     <h3 className="mt-6 mb-3 font-semibold">Consigliati per te</h3>
     <div className="space-y-3">{users.map(u => <UserCard key={u.name} u={u} compact onClick={() => {setUser(u);setScreen('detail')}} />)}</div>
   </div></>
@@ -132,7 +142,44 @@ function Schedule({user,setScreen,setBooking}) {
   </div></>
 }
 
-function Chat({setScreen,booking}) { return <><Back title="Chat" setScreen={setScreen}/><div className="px-5"><div className="bg-white rounded-3xl p-5 shadow-sm">{booking ? <><p className="rounded-3xl bg-slate-100 p-3 text-sm">Sessione confermata. Chat sbloccata.</p><p className="rounded-3xl bg-violet-600 text-white p-3 text-sm mt-3 ml-12">Perfetto, grazie!</p><button onClick={() => setScreen('review')} className="w-full mt-5 py-4 rounded-2xl bg-amber-500 text-white font-semibold">Simula fine sessione e lascia review</button></> : <div className="rounded-3xl bg-violet-50 p-5 text-sm"><div className="text-2xl">🔒</div><b>Chat bloccata</b><p className="mt-2">Prima della conferma puoi proporre solo orari alternativi e Theta premium.</p><button className="w-full bg-white rounded-2xl p-3 text-left mt-4">Proponi martedì 19:30</button></div>}</div></div></> }
+function Messages({setScreen,setActiveChat}) {
+  return <><Back title="Messages" setScreen={setScreen}/><div className="px-5 pb-5 space-y-4">
+    <div className="rounded-3xl bg-gradient-to-br from-[#061743] via-[#3f1c8b] to-[#28145e] p-5 text-white shadow-xl">
+      <div className="flex items-center justify-between"><div><p className="text-sm text-white/70">Inbox</p><h2 className="text-2xl font-semibold">3 nuove conversazioni</h2></div><div className="w-12 h-12 rounded-full bg-white/15 flex items-center justify-center text-2xl">💬</div></div>
+      <p className="text-sm text-white/75 mt-3">La chat si sblocca dopo la prenotazione, mantenendo sicurezza e qualità degli scambi.</p>
+    </div>
+    <div className="space-y-3">
+      {conversations.map(c => <button key={c.name} onClick={() => {setActiveChat(c);setScreen('chat')}} className="w-full bg-white rounded-3xl p-4 shadow-sm text-left">
+        <div className="flex gap-3 items-center">
+          <div className="relative w-14 h-14 rounded-2xl bg-violet-100 flex items-center justify-center font-bold text-violet-800">{c.avatar}{c.online && <span className="absolute -right-1 -bottom-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white"/>}</div>
+          <div className="flex-1 min-w-0">
+            <div className="flex justify-between gap-2"><b>{c.name}</b><span className="text-xs text-slate-400">{c.time}</span></div>
+            <p className="text-xs text-slate-500 mt-0.5">{c.role} • Trust {c.trust} • ★ {c.rating}</p>
+            <p className="text-sm text-slate-600 mt-1 truncate">{c.last}</p>
+          </div>
+          {c.unread > 0 && <span className="min-w-[22px] h-[22px] rounded-full bg-violet-600 text-white text-xs flex items-center justify-center">{c.unread}</span>}
+        </div>
+      </button>)}
+    </div>
+  </div></>
+}
+
+function Chat({setScreen,booking,activeChat}) {
+  const c = activeChat || conversations[0]
+  return <><Back title={c.name} setScreen={setScreen}/><div className="px-5 pb-5 space-y-4">
+    <div className="bg-white rounded-3xl p-4 shadow-sm flex items-center justify-between">
+      <div><b>{c.name}</b><p className="text-sm text-slate-500">{c.role}</p><div className="text-xs mt-1"><Stars/> {c.rating} • Trust {c.trust}</div></div>
+      <Pill tone="green">Verified</Pill>
+    </div>
+    <div className="bg-white rounded-3xl p-5 shadow-sm min-h-[420px] flex flex-col">
+      <p className="rounded-3xl bg-slate-100 p-3 text-sm max-w-[82%]">Ciao Giuseppe, ho visto la tua richiesta. Possiamo fissare una sessione questa settimana?</p>
+      <p className="rounded-3xl bg-violet-600 text-white p-3 text-sm mt-3 ml-auto max-w-[82%]">Certo, mercoledì alle 18 può andare?</p>
+      <p className="rounded-3xl bg-slate-100 p-3 text-sm mt-3 max-w-[82%]">Perfetto. Dopo la prenotazione trovi qui materiali, agenda e riepilogo Theta.</p>
+      {booking && <button onClick={() => setScreen('review')} className="w-full mt-auto py-4 rounded-2xl bg-amber-500 text-white font-semibold">Simula fine sessione e lascia review</button>}
+      {!booking && <div className="mt-auto rounded-3xl bg-violet-50 p-4 text-sm"><b>Chat preview</b><p className="text-slate-600 mt-1">La conversazione completa si sblocca dopo la prenotazione.</p><button onClick={() => setScreen('schedule')} className="w-full mt-3 py-3 rounded-2xl bg-violet-600 text-white font-semibold">Prenota per sbloccare</button></div>}
+    </div>
+  </div></>
+}
 
 function Review({setScreen}) { return <><Back title="Valuta esperienza" setScreen={setScreen}/><div className="px-5 pb-5"><div className="bg-white rounded-3xl p-5 shadow-sm"><h2 className="text-xl font-semibold">Come è andata?</h2><p className="text-sm text-slate-500 mt-1">Il feedback aggiorna rating e Timeless Trust Score.</p>{['Qualità','Puntualità','Comunicazione','Professionalità'].map(x => <div key={x} className="flex justify-between items-center mt-5"><span className="font-medium">{x}</span><Stars/></div>)}<textarea className="w-full mt-5 rounded-2xl border p-3 text-sm" rows="4" placeholder="Scrivi una recensione..."/><button onClick={() => setScreen('reputation')} className="w-full mt-4 py-4 rounded-2xl bg-violet-600 text-white font-semibold">Invia recensione</button></div></div></> }
 
@@ -145,6 +192,7 @@ function App() {
   const [screen,setScreen]=useState('splash')
   const [user,setUser]=useState(users[0])
   const [booking,setBooking]=useState(false)
+  const [activeChat,setActiveChat]=useState(conversations[0])
   let page
   if(screen==='splash') page = <div className="flex-1 flex flex-col items-center justify-between px-8 py-10 text-center"><div/><div><div className="mt-4"><TimelessLogo/></div><p className="mt-10 text-lg font-semibold text-slate-900">L’app che valorizza<br/>il tuo tempo.</p><p className="mt-3 text-sm text-slate-500">Connetti. Organizza. Scambia. Cresci.</p></div><button onClick={() => setScreen('home')} className="w-full py-4 rounded-2xl bg-violet-600 text-white font-semibold">Inizia ora</button></div>
   else if(screen==='home') page=<Home setScreen={setScreen} setUser={setUser}/>
@@ -152,7 +200,8 @@ function App() {
   else if(screen==='detail') page=<Detail user={user} setScreen={setScreen}/>
   else if(screen==='matches') page=<Matches setScreen={setScreen} setUser={setUser}/>
   else if(screen==='schedule') page=<Schedule user={user} setScreen={setScreen} setBooking={setBooking}/>
-  else if(screen==='chat') page=<Chat setScreen={setScreen} booking={booking}/>
+  else if(screen==='messages') page=<Messages setScreen={setScreen} setActiveChat={setActiveChat}/>
+  else if(screen==='chat') page=<Chat setScreen={setScreen} booking={booking} activeChat={activeChat}/>
   else if(screen==='wallet') page=<Wallet setScreen={setScreen}/>
   else if(screen==='reputation') page=<Reputation setScreen={setScreen}/>
   else if(screen==='review') page=<Review setScreen={setScreen}/>
