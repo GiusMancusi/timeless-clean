@@ -1,22 +1,12 @@
-# Timeless Prototype — Static Vercel Version
+# Timeless Prototype v7 — Business Plan Ready
 
 Versione statica no-npm pronta per Vercel.
 
-Include:
-- Chat / Messages nella bottom navigation
-- badge notifiche chat
-- Trust Score e Reputation dashboard
-- rating profili utenti
-- booking con riepilogo reputazionale
-- review post-sessione
-- Wallet Theta
-
-Per deployare: carica il contenuto di questo ZIP nella root del repository GitHub. Non caricare lo ZIP come file.
-
-La root deve contenere almeno:
+Caricare nella root GitHub solo:
 - index.html
-- theta-logo-definitive.png
-- timeless-icon-definitive.png
 - timeless-logo-definitive.png
+- timeless-icon-definitive.png
+- theta-logo-definitive.png
+- README.md
 
-Non sono necessari package.json, package-lock.json, vite.config.js o src/.
+Questa versione integra: student launch segment, AI matching, Theta = 1 minuto, wallet, escrow Theta/fiat, chat post-booking, trust score, verifiche, review post-servizio e fee marketplace.
