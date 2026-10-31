@@ -17,7 +17,7 @@
 </head>
 <body>
   <div id="root"></div>
-  <script type="text/babel" data-presets="react">
+  <script type="text/plain" id="timeless-jsx">
 const { useState } = React;
 const THETA_EUR = 0.50;
 const feeRate = mode => mode === "premium" ? 0.12 : mode === "fiat" ? 0.15 : 0.08;
@@ -94,6 +94,27 @@ function Profile({setScreen}){ return <><Back title="Profile" setScreen={setScre
 function App(){const [screen,setScreen]=useState('splash');const [person,setPerson]=useState(people[0]);const [booked,setBooked]=useState(false);const [transaction,setTransaction]=useState(null);let page;if(screen==='splash')page=<Splash setScreen={setScreen}/>;else if(screen==='home')page=<Home setScreen={setScreen} setPerson={setPerson}/>;else if(screen==='onboarding')page=<Onboarding setScreen={setScreen}/>;else if(screen==='match')page=<Match setScreen={setScreen} setPerson={setPerson}/>;else if(screen==='detail')page=<Detail person={person} setScreen={setScreen}/>;else if(screen==='booking')page=<Booking person={person} setScreen={setScreen} setBooked={setBooked} setTransaction={setTransaction}/>;else if(screen==='bookings')page=<Bookings setScreen={setScreen} transaction={transaction}/>;else if(screen==='messages')page=<Messages setScreen={setScreen} transaction={transaction}/>;else if(screen==='chat')page=<Chat setScreen={setScreen} transaction={transaction}/>;else if(screen==='wallet')page=<Wallet setScreen={setScreen} transaction={transaction}/>;else if(screen==='reputation')page=<Reputation setScreen={setScreen}/>;else if(screen==='review')page=<Review setScreen={setScreen} transaction={transaction} setTransaction={setTransaction}/>;else page=<Profile setScreen={setScreen}/>;return <Shell screen={screen} setScreen={setScreen}>{page}</Shell>}
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+  </script>
+  <script>
+    // Compila JSX con runtime React classico per evitare import ES module nel browser.
+    (function () {
+      var root = document.getElementById('root');
+      try {
+        if (!window.React || !window.ReactDOM || !window.Babel) {
+          throw new Error('Una libreria necessaria (React, ReactDOM o Babel) non è stata caricata.');
+        }
+        var source = document.getElementById('timeless-jsx').textContent;
+        var compiled = Babel.transform(source, {
+          presets: [['react', {runtime: 'classic'}]],
+          sourceType: 'script'
+        }).code;
+        (0, eval)(compiled);
+      } catch (error) {
+        console.error('Timeless startup error:', error);
+        root.innerHTML = '<div style="margin:40px auto;padding:24px;max-width:600px;background:white;border-radius:16px;font-family:system-ui;color:#8b1c1c"><h2>Timeless non è riuscito ad avviarsi</h2><p>Apri la Console (F12) per vedere il dettaglio tecnico.</p><pre style="white-space:pre-wrap"></pre></div>';
+        root.querySelector('pre').textContent = String(error);
+      }
+    })();
   </script>
 </body>
 </html>
