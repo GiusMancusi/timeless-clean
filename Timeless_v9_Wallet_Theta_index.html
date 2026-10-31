@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Timeless v9 — Discover · Book · Exchange</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    html, body, #root { min-height: 100%; margin: 0; }
+    body { background: radial-gradient(circle at top, #e8ddff 0%, #f5f7fb 34%, #e8edf6 100%); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    * { box-sizing: border-box; }
+    button { cursor: pointer; font-family: inherit; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/plain" id="timeless-jsx">
+const { useState } = React;
+const THETA_EUR = 0.50;
+const feeRate = mode => mode === "premium" ? 0.12 : mode === "fiat" ? 0.15 : 0.08;
+const money = v => Number(v).toFixed(2).replace(".", ",");
+
+const people = [
+  {name:'Giulia Bianchi', avatar:'G', role:'Business English Mentor', offers:'Business English', wants:'Financial Markets', match:96, trust:94, rating:4.9, reviews:187, badge:'Expert', price:'60 Θ / 60 min', fee:'Theta Standard 8%', verified:['ID','University','LinkedIn','Skills'], skills:['Business English','CV Review','Public Speaking'], stats:{done:312, completion:'99.2%', response:'1h'}, quote:'Sessione molto concreta, perfetta per preparare interview e presentation.'},
+  {name:'Luca Ferrari', avatar:'L', role:'Excel & Coding Tutor', offers:'Excel e Python', wants:'Business English', match:91, trust:91, rating:4.8, reviews:121, badge:'Trusted', price:'60 Θ / 60 min', fee:'Theta Standard 8%', verified:['ID','Phone','Portfolio'], skills:['Excel','Python','Data Analysis'], stats:{done:198, completion:'97.8%', response:'2h'}, quote:'Mi ha aiutato a trasformare un concept in prototipo cliccabile.'},
+  {name:'Sara Conti', avatar:'S', role:'Career & Interview Mentor', offers:'Interview preparation', wants:'Python', match:88, trust:88, rating:4.7, reviews:86, badge:'Trusted', price:'100 Θ / 60 min', fee:'Theta Premium 12%', verified:['ID','University'], skills:['Mock interviews','CV Review','Career coaching'], stats:{done:144, completion:'96.4%', response:'3h'}, quote:'Simulazioni di colloquio con feedback personalizzato.'}
+];
+const me = {trust:92, rating:4.9, reviews:74, theta:'128 Θ', badge:'Expert Member'};
+const conversations = [
+  {name:'Giulia Bianchi', avatar:'G', last:'Confermo slot mercoledì 18:00. Chat sbloccata dopo booking.', unread:2, trust:94, time:'2 min'},
+  {name:'Luca Ferrari', avatar:'L', last:'Ho caricato materiali e agenda nello scambio.', unread:1, trust:91, time:'1h'},
+  {name:'Sara Conti', avatar:'S', last:'Grazie per la review!', unread:0, trust:88, time:'ieri'}
+];
+
+function Stars(){ return <span className="text-amber-400 tracking-[-1px]">★★★★★</span> }
+function Logo({small=false}){ return <img src="timeless-logo-definitive.png" className={small?'w-[158px] h-auto':'w-[275px] h-auto mx-auto'} /> }
+function Theta({small=false}){ return <img src="theta-logo-definitive.png" className={small?'w-7 h-7 object-contain':'w-32 h-auto mx-auto object-contain'} /> }
+function Pill({children,tone='violet'}){ const map={violet:'bg-violet-50 text-violet-700',green:'bg-emerald-50 text-emerald-700',amber:'bg-amber-50 text-amber-700',blue:'bg-blue-50 text-blue-700',dark:'bg-slate-900 text-white'}; return <span className={'inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold '+map[tone]}>{children}</span> }
+function Card({children, className=''}){ return <div className={'bg-white rounded-3xl p-4 shadow-sm border border-slate-100 '+className}>{children}</div> }
+function Back({title,setScreen}){ return <div className="px-5 py-3 flex items-center justify-between"><button onClick={()=>setScreen('home')} className="w-10 h-10 rounded-2xl bg-white border shadow-sm">←</button><b>{title}</b><span className="text-slate-400">●●●</span></div> }
+function TrustLine({p}){ return <div className="flex flex-wrap gap-2 items-center"><Pill tone="green">Trust {p.trust}/100</Pill><Pill tone="amber">🏆 {p.badge}</Pill><span className="text-xs text-slate-500"><Stars/> {p.rating} ({p.reviews})</span></div> }
+
+function Shell({screen,setScreen,children}){
+ const hide=screen==='splash'||screen==='detail'||screen==='booking'||screen==='review'||screen==='chat';
+ const nav=[['home','⌂','Scopri'],['match','⌕','Cerca'],['bookings','▣','Prenotazioni'],['messages','✉','Messaggi'],['wallet','Θ','Wallet']];
+ return <div className="min-h-screen flex items-center justify-center p-4">
+  <div className="w-[390px] h-[820px] max-w-[96vw] max-h-[94vh] bg-black rounded-[48px] p-[10px] shadow-2xl">
+   <div className="h-full bg-[#fbfbfd] rounded-[40px] overflow-hidden flex flex-col">
+    <div className="h-8 px-7 flex items-center justify-between text-[11px] font-semibold"><span>TIMELESS v9</span><span className="text-amber-700">● DEMO SIMULATA</span></div>
+    <main className="flex-1 overflow-y-auto">{children}</main>
+    {!hide && <div className="h-[78px] bg-white border-t grid grid-cols-5 text-[10px] px-1">
+     {nav.map(([id,icon,label])=><button key={id} onClick={()=>setScreen(id)} className={(screen===id?'text-violet-600':'text-slate-500')+' relative flex flex-col items-center justify-center gap-1'}>
+       <div className={'text-xl'}>{icon}</div>
+       
+       <span className={''}>{label}</span>
+      </button>)}
+    </div>}
+   </div>
+  </div>
+ </div>
+}
+
+function Header({setScreen}){ return <div className="px-5 py-3 flex items-center justify-between"><button onClick={()=>setScreen('home')}><Logo small/></button><button onClick={()=>setScreen('profile')} className="w-10 h-10 rounded-full bg-slate-900 text-white text-xs">GM</button></div> }
+
+function Splash({setScreen}){ return <div className="h-full flex flex-col justify-between px-8 py-10 text-center"><div className="text-xs tracking-widest text-violet-700 font-bold">INVESTOR GRADE • OCT 2026</div><div><Logo/><p className="mt-8 text-xl font-semibold text-slate-900">Human Capital. Exchanged Intelligently.</p><p className="mt-3 text-sm text-slate-500">Academic & Career Skills Exchange: trova persone, scambia competenze, guadagna Theta.</p><div className="mt-6 grid grid-cols-3 gap-2 text-[11px]"><Pill>AI Match demo</Pill><Pill tone="green">Theta Wallet</Pill><Pill tone="amber">Trust</Pill></div><p className="text-xs mt-6 text-slate-400">Tutti i profili, i saldi e le operazioni sono dati dimostrativi. Nessun pagamento reale.</p></div><button onClick={()=>setScreen('home')} className="w-full py-4 rounded-2xl bg-violet-600 text-white font-semibold">Esplora Timeless →</button></div> }
+
+function Home({setScreen,setPerson,search,setSearch}){
+ const [quick,setQuick]=useState('');
+ const categories=['Excel','Python','Business English','CV Review','Interview'];
+ return <><Header setScreen={setScreen}/><div className="px-5 pb-6 space-y-5">
+  <div className="rounded-3xl bg-gradient-to-br from-[#061743] via-[#4d1b88] to-[#ff6b1a] p-5 text-white shadow-xl">
+   <p className="text-[11px] uppercase tracking-widest text-white/75">Timeless · Academic & Career Skills</p>
+   <h1 className="text-3xl leading-tight font-bold mt-3">Cosa vuoi imparare oggi?</h1>
+   <p className="text-sm text-white/80 mt-2">Trova la persona giusta. Scegli quando. Prenota in pochi passaggi.</p>
+   <div className="flex gap-2 mt-5 bg-white rounded-2xl p-2 shadow-lg"><input aria-label="Cerca una competenza" value={quick} onChange={e=>setQuick(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){setSearch({...search,query:quick});setScreen('match')}}} className="text-slate-900 flex-1 min-w-0 px-2 outline-none text-sm" placeholder="Es. Excel, inglese, colloqui..."/><button onClick={()=>{setSearch({...search,query:quick});setScreen('match')}} className="bg-violet-600 rounded-xl px-4 py-3 text-white text-sm font-semibold">Cerca →</button></div>
+  </div>
+  <div><div className="flex items-center justify-between"><h2 className="font-bold text-slate-900">Esplora per competenza</h2><button className="text-xs text-violet-700 font-bold" onClick={()=>setScreen('match')}>Tutti i filtri →</button></div><div className="flex flex-wrap gap-2 mt-3">{categories.map(c=><button key={c} onClick={()=>{setSearch({...search,query:c});setScreen('match')}} className="bg-white border border-violet-100 text-violet-800 rounded-full px-4 py-2.5 text-sm font-semibold">{c}</button>)}</div></div>
+  <div className="grid grid-cols-2 gap-3"><button onClick={()=>setScreen('match')} className="bg-white border rounded-3xl p-4 text-left"><span className="text-2xl">🔎</span><b className="block mt-2 text-sm">Cerco una competenza</b><p className="text-xs text-slate-500 mt-1">Trova tutor e mentor</p></button><button onClick={()=>setScreen('onboarding')} className="bg-white border rounded-3xl p-4 text-left"><span className="text-2xl">✨</span><b className="block mt-2 text-sm">Offro una competenza</b><p className="text-xs text-slate-500 mt-1">Condividi ciò che sai</p></button></div>
+  <div><h2 className="font-bold mb-3">Persone da scoprire</h2><div className="space-y-3">{people.map(p=><PersonCard key={p.name} p={p} onClick={()=>{setPerson(p);setScreen('detail')}} />)}</div></div>
+  <Card className="bg-violet-50"><b>Come funziona?</b><p className="text-sm text-slate-600 mt-2">1. Cerca una competenza · 2. Scegli durata e orario · 3. Prenota e scambia.</p><p className="text-xs text-slate-500 mt-2">Theta: 1 Θ = 1 minuto, €0,50 di riferimento. Demo senza transazioni reali.</p></Card>
+ </div></>
+}
+function PersonCard({p,onClick}){ return <button onClick={onClick} className="w-full bg-white rounded-3xl p-4 shadow-sm text-left border border-slate-100"><div className="flex gap-3"><div className="w-14 h-14 rounded-2xl bg-violet-100 flex items-center justify-center font-bold text-violet-800">{p.avatar}</div><div className="flex-1 min-w-0"><div className="flex justify-between"><b>{p.name}</b><span className="text-emerald-600 text-sm font-bold">{p.match}%</span></div><p className="text-sm text-slate-500">{p.role}</p><p className="text-xs text-slate-500 mt-1">Offre {p.offers} • Cerca {p.wants}</p><div className="mt-2"><TrustLine p={p}/></div><div className="mt-2 flex justify-between"><b className="text-amber-700 text-sm">{p.price}</b><span className="text-xs text-slate-400">{p.fee}</span></div></div></div></button> }
+
+function Onboarding({setScreen}){ return <><Back title="Verification" setScreen={setScreen}/><div className="px-5 pb-5 space-y-4"><Card><h2 className="text-xl font-semibold">Trust & Verification · Demo</h2><p className="text-sm text-slate-500 mt-2">Il business plan prevede verifica identità, competenze e segnali antifrode prima di scalare il marketplace.</p></Card>{['Email & phone verification','University / student status','Identity document','LinkedIn / portfolio','Skill verification test'].map((x,i)=><Card key={x}><div className="flex justify-between"><b>{x}</b><Pill tone={i<3?'green':'blue'}>{i<3?'Demo':'Futuro'}</Pill></div></Card>)}<button onClick={()=>setScreen('match')} className="w-full py-4 rounded-2xl bg-violet-600 text-white font-semibold">Continue to AI Match</button></div></> }
+function Match({setScreen,setPerson,search,setSearch}){
+ const [advanced,setAdvanced]=useState(false);
+ const set=(key,value)=>setSearch({...search,[key]:value});
+ const field='w-full border border-slate-200 rounded-xl p-3 bg-white text-sm text-slate-800';
+ const basePrice=p=>p.badge==='Expert'?60:(p.name==='Sara Conti'?100:60);
+ const filtered=people.filter(p=>{
+  const hay=[p.name,p.offers,p.wants,p.role,...p.skills].join(' ').toLowerCase();
+  const q=search.query.trim().toLowerCase();
+  const tokens=q.split(/\s+/).filter(Boolean);
+  const matchesQuery=!q||tokens.some(t=>hay.includes(t));
+  const matchesPrice=search.budget===''||basePrice(p)*(Number(search.duration)/60)*(search.currency==='eur'?THETA_EUR:1)<=Number(search.budget);
+  const matchesMode=search.mode!=='premium'||p.name==='Sara Conti';
+  return matchesQuery&&matchesPrice&&matchesMode;
+ });
+ return <><Back title="Trova una competenza" setScreen={setScreen}/><div className="px-5 pb-6 space-y-4">
+  <div className="rounded-3xl bg-gradient-to-br from-[#061743] via-[#4d1b88] to-[#ff6b1a] p-5 text-white"><h2 className="text-xl font-bold">Trova la persona giusta</h2><p className="text-xs text-white/80 mt-1">Personalizza la tua ricerca, senza impegno.</p></div>
+  <Card><label className="text-sm font-bold">Cosa vuoi imparare?</label><input className={field+' mt-2'} value={search.query} onChange={e=>set('query',e.target.value)} placeholder="Excel, Python, English, CV..."/><div className="mt-4 grid grid-cols-2 gap-3"><div><label className="text-xs font-bold">Quando?</label><select className={field+' mt-1'} value={search.period} onChange={e=>set('period',e.target.value)}><option value="any">Qualsiasi orario</option><option value="morning">Mattina · 08–12</option><option value="afternoon">Pomeriggio · 12–18</option><option value="evening">Sera · 18–23</option></select></div><div><label className="text-xs font-bold">Durata</label><select className={field+' mt-1'} value={search.duration} onChange={e=>set('duration',Number(e.target.value))}>{[30,45,60,90].map(n=><option key={n} value={n}>{n} minuti</option>)}</select></div></div>
+   <button onClick={()=>setAdvanced(!advanced)} className="mt-4 text-sm text-violet-700 font-bold">{advanced?'− Nascondi filtri':'+ Budget, data e modalità di scambio'}</button>
+   {advanced&&<div className="mt-3 pt-3 border-t space-y-3"><div><label className="text-xs font-bold">Data preferita (opzionale)</label><input type="date" value={search.date} onChange={e=>set('date',e.target.value)} className={field+' mt-1'}/></div><div><label className="text-xs font-bold">Budget massimo per la sessione</label><div className="flex gap-2 mt-1"><input type="number" min="0" value={search.budget} onChange={e=>set('budget',e.target.value)} placeholder="Nessun limite" className={field+' flex-1 min-w-0'}/><select value={search.currency} onChange={e=>set('currency',e.target.value)} className="border rounded-xl px-2 text-sm"><option value="theta">Θ</option><option value="eur">€</option></select></div><p className="text-[11px] text-slate-500 mt-1">Budget indicativo; il prezzo finale dipende dall'offerta e dalle commissioni.</p></div><div><label className="text-xs font-bold">Come vuoi scambiare?</label><select className={field+' mt-1'} value={search.mode} onChange={e=>set('mode',e.target.value)}><option value="any">Tutte le modalità</option><option value="standard">Theta Standard · 8%</option><option value="premium">Theta Premium · 12%</option><option value="fiat">Euro · 15%</option></select></div></div>}
+  </Card>
+  <div className="flex items-center justify-between"><b className="text-sm">{filtered.length} profili compatibili</b><span className="text-xs text-slate-500">Profili dimostrativi</span></div>
+  {search.date||search.period!=='any'?<p className="text-xs bg-amber-50 rounded-xl p-3 text-amber-900">La fascia oraria e la data sono preferenze: la disponibilità effettiva sarà confermata durante la prenotazione.</p>:null}
+  {filtered.length?filtered.map(p=><PersonCard key={p.name} p={p} onClick={()=>{setPerson(p);setScreen('detail')}}/>):<Card><b>Nessun profilo per questi filtri</b><p className="text-sm text-slate-500 mt-2">Prova ad aumentare il budget o a cercare una competenza diversa.</p><button className="mt-3 text-violet-700 font-bold" onClick={()=>setSearch({...search,query:'',budget:'',mode:'any'})}>Azzera i filtri →</button></Card>}
+ </div></>
+}
+function Detail({person,setScreen}){ return <><Back title="Skill profile" setScreen={setScreen}/><div className="px-5 pb-5 space-y-4"><Card><div className="flex gap-4"><div className="w-20 h-20 rounded-3xl bg-violet-100 flex items-center justify-center text-3xl font-bold text-violet-800">{person.avatar}</div><div><h2 className="text-2xl font-semibold">{person.name}</h2><p className="text-slate-500">{person.role}</p><div className="mt-2"><TrustLine p={person}/></div></div></div><p className="mt-4 text-sm text-slate-600">{person.quote}</p></Card><Card><b>Segnali di verifica · demo</b><div className="mt-3 flex flex-wrap gap-2">{person.verified.map(v=><Pill key={v} tone="green">✓ {v}</Pill>)}</div></Card><Card><b>Affidabilità</b><div className="grid grid-cols-3 gap-2 mt-3 text-center"><div className="bg-slate-50 rounded-2xl p-3"><b>{person.stats.done}</b><p className="text-[10px] text-slate-500">scambi</p></div><div className="bg-slate-50 rounded-2xl p-3"><b>{person.stats.completion}</b><p className="text-[10px] text-slate-500">completion</p></div><div className="bg-slate-50 rounded-2xl p-3"><b>{person.stats.response}</b><p className="text-[10px] text-slate-500">response</p></div></div></Card><Card><b>Competenze</b><div className="mt-3 flex flex-wrap gap-2">{person.skills.map(x=><Pill key={x}>{x}</Pill>)}</div></Card><Card className="bg-amber-50"><b>Regola comunicazioni</b><p className="text-sm mt-1">Chat disponibile solo dopo booking confermato.</p></Card><button onClick={()=>setScreen('booking')} className="w-full py-4 rounded-2xl bg-violet-600 text-white font-semibold">Prenota una sessione →</button></div></> }
+
+function Booking({person,setScreen,setBooked,setTransaction,search}){
+ const [mode,setMode]=useState(search.mode==='premium'||search.mode==='fiat'?search.mode:'standard');
+ const [minutes,setMinutes]=useState(search.duration||60);
+ const [date,setDate]=useState(search.date||'');
+ const [period,setPeriod]=useState(search.period||'any');
+ const [slot,setSlot]=useState('Mercoledì · 18:00');
+ const [offer,setOffer]=useState('');
+ const [step,setStep]=useState(1);
+ const theta=mode==='premium'?Math.round(minutes*100/60):minutes;
+ const base=mode==='fiat'?minutes*THETA_EUR:theta;
+ const fee=base*feeRate(mode);const total=base+fee;
+ const proposed=offer.trim()!==''&&Number(offer)>=0?Number(offer):null;
+ const validOffer=proposed===null||Number.isFinite(proposed);
+ return <><Back title="Prenota una sessione" setScreen={setScreen}/><div className="px-5 pb-6 space-y-4">
+  <div className="flex justify-between text-xs font-bold text-violet-700 px-1"><span>1 · Sessione</span><span>2 · Prezzo</span><span>3 · Conferma</span></div><div className="h-1.5 bg-violet-100 rounded-full"><div className="h-full bg-violet-600 rounded-full" style={{width:(step/3*100)+'%'}}></div></div>
+  <Card><b>{person.offers}</b><p className="text-sm text-slate-500 mt-1">Con {person.name} · ★ {person.rating} · Trust {person.trust}/100</p></Card>
+  {step===1&&<><Card><b>Quanto tempo ti serve?</b><div className="grid grid-cols-4 gap-2 mt-3">{[30,45,60,90].map(m=><button key={m} onClick={()=>setMinutes(m)} className={'rounded-xl py-3 text-xs font-semibold border '+(minutes===m?'border-violet-600 bg-violet-50 text-violet-700':'')}>{m} min</button>)}</div><b className="block mt-5">Quando preferisci?</b><label className="block text-xs text-slate-500 mt-2">Data desiderata (opzionale)</label><input type="date" value={date} onChange={e=>setDate(e.target.value)} className="w-full border rounded-xl p-3 mt-1 text-sm"/><label className="block text-xs text-slate-500 mt-3">Fascia oraria</label><select value={period} onChange={e=>setPeriod(e.target.value)} className="w-full border rounded-xl p-3 mt-1 text-sm"><option value="any">Flessibile</option><option value="morning">Mattina · 08–12</option><option value="afternoon">Pomeriggio · 12–18</option><option value="evening">Sera · 18–23</option></select><p className="text-xs text-slate-500 mt-3">Oppure scegli uno slot dimostrativo:</p><div className="grid grid-cols-2 gap-2 mt-2">{['Mercoledì · 18:00','Giovedì · 12:30'].map(x=><button key={x} onClick={()=>setSlot(x)} className={'rounded-xl p-3 text-xs border '+(slot===x?'border-violet-600 bg-violet-50':'')}>{x}</button>)}</div><p className="text-xs text-amber-700 mt-3">Le disponibilità non sono sincronizzate con calendari reali.</p></Card><button onClick={()=>setStep(2)} className="w-full py-4 rounded-2xl bg-violet-600 text-white font-semibold">Continua · scegli il prezzo →</button></>}
+  {step===2&&<><Card><b>Come vuoi pagare o scambiare?</b><div className="space-y-2 mt-3">{[['standard','Theta Standard · 8%'],['premium','Theta Premium · 12%'],['fiat','Euro · 15%']].map(([id,label])=><button key={id} onClick={()=>setMode(id)} className={'w-full text-left rounded-xl border p-3 text-sm '+(mode===id?'border-violet-600 bg-violet-50 font-bold':'')}>{mode===id?'◉':'○'} {label}</button>)}</div><div className="mt-5 p-3 bg-slate-50 rounded-xl"><p className="text-xs text-slate-500">Prezzo indicativo dell'offerta</p><b className="text-xl">{mode==='fiat'?'€'+money(base):money(theta)+' Θ'}</b><p className="text-xs text-slate-500 mt-1">Prima della commissione piattaforma.</p></div><label className="block mt-5 text-sm font-bold">Vuoi proporre un prezzo diverso?</label><p className="text-xs text-slate-500 mt-1">Opzionale: la proposta non è automaticamente accettata.</p><div className="flex gap-2 mt-2"><input type="number" min="0" value={offer} onChange={e=>setOffer(e.target.value)} placeholder="Prezzo proposto" className="border rounded-xl p-3 flex-1 min-w-0 text-sm"/><span className="bg-slate-50 rounded-xl px-4 py-3">{mode==='fiat'?'€':'Θ'}</span></div></Card><div className="flex gap-2"><button onClick={()=>setStep(1)} className="border bg-white rounded-2xl px-5 py-4">←</button><button disabled={!validOffer} onClick={()=>setStep(3)} className="flex-1 py-4 rounded-2xl bg-violet-600 text-white font-semibold disabled:opacity-50">Rivedi la prenotazione →</button></div></>}
+  {step===3&&<><Card><b>Riepilogo della richiesta</b><div className="space-y-3 mt-4 text-sm"><div className="flex justify-between"><span>Durata</span><b>{minutes} minuti</b></div><div className="flex justify-between"><span>Preferenza oraria</span><b>{period==='any'?'Flessibile':period==='morning'?'Mattina':period==='afternoon'?'Pomeriggio':'Sera'}</b></div>{date&&<div className="flex justify-between"><span>Data desiderata</span><b>{date}</b></div>}<div className="flex justify-between"><span>Slot demo</span><b>{slot}</b></div><div className="flex justify-between"><span>Prezzo offerto</span><b>{mode==='fiat'?'€'+money(base):money(theta)+' Θ'}</b></div><div className="flex justify-between"><span>Commissione {Math.round(feeRate(mode)*100)}%</span><b>{mode==='fiat'?'€'+money(fee):money(fee)+' Θ'}</b></div><div className="flex justify-between border-t pt-3"><b>Totale indicativo</b><b>{mode==='fiat'?'€'+money(total):money(total)+' Θ'}</b></div>{proposed!==null&&<div className="bg-amber-50 rounded-xl p-3"><b>La tua proposta: {mode==='fiat'?'€'+money(proposed):money(proposed)+' Θ'}</b><p className="text-xs mt-1">Soggetta ad accettazione del provider; il totale qui sopra è calcolato sul prezzo pubblicato.</p></div>}</div></Card><Card className="bg-amber-50"><b>Demo senza pagamenti reali</b><p className="text-sm mt-1">Prenotazione, disponibilità, negoziazione ed escrow sono simulati. Nessun trasferimento di denaro o Theta.</p></Card><div className="flex gap-2"><button onClick={()=>setStep(2)} className="border bg-white rounded-2xl px-5 py-4">←</button><button onClick={()=>{setTransaction({person,mode,minutes,slot,date,period,offer:proposed,theta,base,fee,total,status:'booked'});setBooked(true);setScreen('chat')}} className="flex-1 py-4 rounded-2xl bg-violet-600 text-white font-semibold">Conferma demo →</button></div></>}
+ </div></>
+}
+function Bookings({setScreen,transaction}){return <><Back title="I miei scambi" setScreen={setScreen}/><div className="px-5 pb-5 space-y-3"><Card className="bg-violet-50"><b>Journey Timeless</b><p className="text-sm mt-2">Discovery → Matching → Booking → Escrow → Sessione → Review → Trust</p></Card>{transaction?<Card><div className="flex justify-between"><b>{transaction.person.offers}</b><Pill tone="green">{transaction.status==='completed'?'Completato':'Prenotato'}</Pill></div><p className="text-sm mt-2">{transaction.person.name} · {transaction.minutes} minuti</p><p className="text-xs text-slate-500 mt-1">{transaction.slot} · {transaction.mode==='fiat'?'€'+money(transaction.total):money(transaction.total)+' Θ'} · Demo</p><button onClick={()=>setScreen(transaction.status==='completed'?'reputation':'chat')} className="text-violet-700 font-semibold mt-3">{transaction.status==='completed'?'Vedi Trust Score':'Apri chat →'}</button></Card>:<Card><b>Nessuna prenotazione demo attiva</b><p className="text-sm text-slate-500 mt-2">Seleziona una competenza e conferma un booking per vedere il flusso completo.</p></Card>}<button onClick={()=>setScreen('match')} className="w-full py-4 rounded-2xl bg-violet-600 text-white font-semibold">Trova una competenza</button></div></> }
+
+function Messages({setScreen,transaction}){return <><Back title="Messaggi" setScreen={setScreen}/><div className="px-5 pb-5 space-y-4"><Card className="bg-violet-50"><b>Chat controllata</b><p className="text-sm text-slate-600 mt-1">La chat si abilita dopo una prenotazione confermata, non durante la ricerca.</p></Card>{transaction?<button onClick={()=>setScreen('chat')} className="w-full bg-white rounded-3xl p-4 text-left border"><b>{transaction.person.name}</b><p className="text-sm text-slate-500 mt-1">Booking demo confermato · Apri conversazione →</p></button>:<Card><b>Chat bloccata</b><p className="text-sm text-slate-500 mt-2">Prenota una sessione per attivare la conversazione.</p><button onClick={()=>setScreen('match')} className="mt-3 text-violet-700 font-semibold">Vai al marketplace →</button></Card>}</div></> }
+
+function Chat({setScreen,transaction}){const [msg,setMsg]=useState('');const [messages,setMessages]=useState([]);if(!transaction)return <><Back title="Chat" setScreen={setScreen}/><div className="p-5"><Card>Per aprire la chat devi prima confermare un booking demo.<button onClick={()=>setScreen('match')} className="block text-violet-700 mt-3 font-bold">Trova competenze →</button></Card></div></>;return <><Back title={transaction.person.name} setScreen={setScreen}/><div className="px-5 pb-5 space-y-4"><Card><b>{transaction.person.offers}</b><p className="text-xs text-slate-500">{transaction.slot} · {transaction.minutes} min · {transaction.status==='completed'?'Completato':'Escrow simulato'}</p></Card><Card><p className="rounded-2xl bg-slate-100 p-3 text-sm">Ciao! Grazie per la prenotazione. Prepariamo insieme la sessione.</p>{messages.map((m,i)=><p key={i} className="rounded-2xl bg-violet-600 text-white p-3 text-sm mt-2 ml-auto max-w-[85%]">{m}</p>)}<div className="flex gap-2 mt-4"><input value={msg} onChange={e=>setMsg(e.target.value)} placeholder="Scrivi un messaggio demo" className="min-w-0 flex-1 border rounded-xl p-2 text-sm"/><button onClick={()=>{if(msg.trim()){setMessages([...messages,msg.trim()]);setMsg('')}}} className="bg-violet-600 text-white rounded-xl px-3">Invia</button></div><p className="text-xs text-slate-400 mt-2">Messaggi solo in memoria: non vengono inviati realmente.</p></Card>{transaction.status!=='completed'&&<button onClick={()=>setScreen('review')} className="w-full py-4 rounded-2xl bg-amber-500 text-white font-semibold">Completa sessione e valuta →</button>}</div></> }
+
+function Wallet({setScreen,transaction}){
+ const [balance,setBalance]=useState(128);
+ const [account,setAccount]=useState('');
+ const [action,setAction]=useState('buy');
+ const [amount,setAmount]=useState('30');
+ const [history,setHistory]=useState([]);
+ const [notice,setNotice]=useState('');
+ const euros=Number(amount);
+ const valid=Number.isFinite(euros)&&euros>0&&Math.round(euros*100)===euros*100;
+ const theta=valid?euros/THETA_EUR:0;
+ const canConfirm=Boolean(account)&&valid&&(action==='buy'||theta<=balance);
+ function confirm(){
+  if(!canConfirm)return;
+  const delta=action==='buy'?theta:-theta;
+  setBalance(old=>Math.round((old+delta)*100)/100);
+  setHistory(old=>[{label:action==='buy'?'Acquisto Theta (simulato)':'Prelievo Theta (simulato)',delta,euros,account},...old]);
+  setNotice(action==='buy'?'Ricarica demo completata. Nessun addebito reale.':'Prelievo demo completato. Nessun bonifico reale.');
+ }
+ return <><Back title="Theta Wallet" setScreen={setScreen}/><div className="px-5 pb-5 space-y-4">
+  <div className="rounded-3xl bg-gradient-to-br from-[#061743] via-[#3f1c8b] to-[#28145e] p-6 text-white text-center"><div className="bg-white rounded-3xl px-3 py-2 inline-block"><Theta/></div><p className="text-sm text-white/70 mt-4">Saldo dimostrativo</p><h1 className="text-4xl font-bold text-amber-400">{money(balance)} Θ</h1><p className="text-xs text-white/70 mt-2">{money(balance)} minuti · €{money(balance*THETA_EUR)} valore di riferimento</p></div>
+  <Card><b>Gestisci i tuoi Theta</b><p className="text-xs text-slate-500 mt-1">Simulazione interattiva: non inserire dati bancari reali e non avvengono movimenti di denaro.</p>
+   <div className="grid grid-cols-2 gap-2 mt-4">{[['buy','＋ Acquista Theta'],['withdraw','↗ Preleva Theta']].map(([id,label])=><button key={id} onClick={()=>{setAction(id);setNotice('')}} className={'rounded-xl py-3 px-2 text-sm font-semibold border '+(action===id?'bg-violet-600 text-white border-violet-600':'bg-white text-slate-700')}>{label}</button>)}</div>
+   <label className="block mt-4 text-sm font-semibold">Conto associato (demo)</label><select value={account} onChange={e=>{setAccount(e.target.value);setNotice('')}} className="w-full mt-2 border rounded-xl p-3 text-sm bg-white"><option value="">Seleziona un conto</option><option value="conto-demo">Conto demo •••• 4821</option></select><p className="text-xs text-slate-500 mt-1">Il collegamento bancario è illustrativo. Non vengono richiesti IBAN, password o credenziali.</p>
+   <label className="block mt-4 text-sm font-semibold">{action==='buy'?'Importo da caricare':'Importo da prelevare'} (€)</label><div className="flex gap-2 mt-2"><input type="number" min="0.50" step="0.50" value={amount} onChange={e=>{setAmount(e.target.value);setNotice('')}} className="flex-1 min-w-0 border rounded-xl p-3 text-sm"/><span className="rounded-xl bg-slate-100 p-3 font-bold">€</span></div>
+   <div className="bg-violet-50 rounded-xl p-4 mt-4 text-sm"><div className="flex justify-between"><span>{action==='buy'?'Theta accreditati':'Theta da scalare'}</span><b>{valid?money(theta):'—'} Θ</b></div><div className="flex justify-between mt-2"><span>Rapporto di riferimento</span><b>1 Θ = €0,50</b></div><div className="flex justify-between mt-2"><span>Commissione di conversione</span><b>€0,00</b></div>{action==='withdraw'&&theta>balance&&<p className="text-red-700 text-xs mt-3">Saldo insufficiente: massimo prelevabile €{money(balance*THETA_EUR)}.</p>}</div>
+   <button disabled={!canConfirm} onClick={confirm} className="w-full mt-4 py-4 rounded-2xl bg-violet-600 text-white font-semibold disabled:opacity-40">{action==='buy'?'Simula acquisto Theta':'Simula prelievo Theta'} →</button>
+   {notice&&<p role="status" className="bg-green-50 text-green-800 rounded-xl p-3 text-sm mt-3">{notice}</p>}
+  </Card>
+  <Card><b>Movimenti dimostrativi</b>{history.map((h,i)=><div key={i} className="flex justify-between gap-3 py-3 border-b"><div><p className="text-sm">{h.label}</p><p className="text-xs text-slate-500">Conto demo •••• 4821 · €{money(h.euros)}</p></div><b className={'text-sm whitespace-nowrap '+(h.delta>0?'text-green-700':'text-slate-800')}>{h.delta>0?'+':'−'}{money(Math.abs(h.delta))} Θ</b></div>)}{[['+60 Θ','Sessione Excel erogata'],['−4,8 Θ','Commissione standard 8%'],['−30 Θ','Sessione Career acquistata']].map(([a,b])=><div key={b} className="flex justify-between gap-3 py-3 border-b last:border-0"><span className="text-sm text-slate-600">{b}</span><b className="text-sm whitespace-nowrap">{a}</b></div>)}{transaction&&<div className="mt-3 rounded-xl bg-amber-50 p-3 text-sm">Prenotazione {transaction.status==='completed'?'completata':'confermata'}: {transaction.mode==='fiat'?'€'+money(transaction.total):money(transaction.total)+' Θ'} · nessun movimento reale</div>}</Card>
+  <Card><b>Regole Theta</b><p className="text-sm text-slate-600 mt-2">1 Θ = 1 minuto = €0,50 di riferimento fisso. 60 Θ = €30. Non è una criptovaluta.</p><div className="grid grid-cols-3 gap-2 mt-4 text-center text-xs">{[['Standard','8%'],['Premium','12%'],['Fiat','15%']].map(([a,b])=><div key={a} className="bg-violet-50 rounded-xl p-2"><b>{b}</b><p>{a}</p></div>)}</div></Card>
+  <Card className="bg-amber-50"><b>Funzionalità dimostrativa</b><p className="text-sm text-slate-600 mt-2">Acquisto, conto associato, prelievo e saldo sono simulati nel browser. L'attivazione reale richiederà un intermediario di pagamento e verifiche legali, antiriciclaggio e fiscali.</p></Card>
+ </div></>
+}
+
+function Reputation({setScreen}){ return <><Back title="Trust Score" setScreen={setScreen}/><div className="px-5 pb-5 space-y-4"><div className="rounded-3xl bg-gradient-to-br from-[#061743] via-[#3f1c8b] to-[#28145e] p-6 text-white text-center"><p className="text-sm text-white/70">Timeless Trust Score</p><div className="mx-auto mt-4 w-36 h-36 rounded-full border-[12px] border-white/20 flex items-center justify-center"><span className="text-4xl font-bold text-amber-400">92</span></div><p className="mt-3"><Stars/> 4.9 (74 reviews)</p><Pill tone="amber">🏆 Expert Member</Pill></div><Card><b>Score breakdown</b>{[['Rating utenti','38/40'],['Storico scambi','24/25'],['Affidabilità','23/25'],['Verifiche','7/10']].map(([a,b])=><div key={a} className="flex justify-between border-b last:border-b-0 py-3 text-sm"><span>{a}</span><b>{b}</b></div>)}</Card></div></> }
+function Review({setScreen,setTransaction,transaction}){const [stars,setStars]=useState(5);const [comment,setComment]=useState('');return <><Back title="Review & release" setScreen={setScreen}/><div className="px-5 pb-5"><Card><h2 className="text-xl font-semibold">Come è andata la sessione?</h2><p className="text-sm text-slate-500 mt-1">Feedback dimostrativo: contribuisce al Trust Score e al ranking.</p><div className="flex gap-2 mt-5">{[1,2,3,4,5].map(n=><button key={n} onClick={()=>setStars(n)} className={'text-3xl '+(n<=stars?'text-amber-500':'text-slate-300')}>★</button>)}</div><textarea value={comment} onChange={e=>setComment(e.target.value)} className="w-full mt-5 rounded-2xl border p-3 text-sm" rows="4" placeholder="Scrivi una recensione..."/><button onClick={()=>{if(transaction)setTransaction({...transaction,status:'completed',rating:stars,comment});setScreen('bookings')}} className="w-full mt-4 py-4 rounded-2xl bg-violet-600 text-white font-semibold">Invia review e simula release →</button><p className="text-xs text-slate-400 mt-3">Nessun escrow reale viene rilasciato.</p></Card></div></> }
+
+function Profile({setScreen}){ return <><Back title="Profile" setScreen={setScreen}/><div className="px-5 pb-5 space-y-4"><Card className="text-center"><div className="w-20 h-20 mx-auto rounded-full bg-violet-100 flex items-center justify-center font-bold text-violet-800">GM</div><h3 className="text-xl font-semibold mt-4">Giuseppe</h3><p className="text-sm text-slate-500">Finance • Mentoring • Markets</p><div className="mt-3 flex justify-center"><Pill tone="green">Trust 92/100</Pill></div><p className="mt-3 text-sm"><Stars/> 4.9 (74)</p></Card><Card><b>Business model signals</b><p className="text-sm text-slate-500 mt-2">Subscription, premium transactions, verification services and marketplace fees can all be layered on this user base.</p></Card></div></> }
+
+function App(){const [screen,setScreen]=useState('home');const [person,setPerson]=useState(people[0]);const [booked,setBooked]=useState(false);const [transaction,setTransaction]=useState(null);const [search,setSearch]=useState({query:'',period:'any',duration:60,date:'',budget:'',currency:'theta',mode:'any'});let page;if(screen==='splash')page=<Splash setScreen={setScreen}/>;else if(screen==='home')page=<Home setScreen={setScreen} setPerson={setPerson} search={search} setSearch={setSearch}/>;else if(screen==='onboarding')page=<Onboarding setScreen={setScreen}/>;else if(screen==='match')page=<Match setScreen={setScreen} setPerson={setPerson} search={search} setSearch={setSearch}/>;else if(screen==='detail')page=<Detail person={person} setScreen={setScreen}/>;else if(screen==='booking')page=<Booking person={person} setScreen={setScreen} setBooked={setBooked} setTransaction={setTransaction} search={search}/>;else if(screen==='bookings')page=<Bookings setScreen={setScreen} transaction={transaction}/>;else if(screen==='messages')page=<Messages setScreen={setScreen} transaction={transaction}/>;else if(screen==='chat')page=<Chat setScreen={setScreen} transaction={transaction}/>;else if(screen==='wallet')page=<Wallet setScreen={setScreen} transaction={transaction}/>;else if(screen==='reputation')page=<Reputation setScreen={setScreen}/>;else if(screen==='review')page=<Review setScreen={setScreen} transaction={transaction} setTransaction={setTransaction}/>;else page=<Profile setScreen={setScreen}/>;return <Shell screen={screen} setScreen={setScreen}>{page}</Shell>}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+  </script>
+  <script>
+    // Compila JSX con runtime React classico per evitare import ES module nel browser.
+    (function () {
+      var root = document.getElementById('root');
+      try {
+        if (!window.React || !window.ReactDOM || !window.Babel) {
+          throw new Error('Una libreria necessaria (React, ReactDOM o Babel) non è stata caricata.');
+        }
+        var source = document.getElementById('timeless-jsx').textContent;
+        var compiled = Babel.transform(source, {
+          presets: [['react', {runtime: 'classic'}]],
+          sourceType: 'script'
+        }).code;
+        (0, eval)(compiled);
+      } catch (error) {
+        console.error('Timeless startup error:', error);
+        root.innerHTML = '<div style="margin:40px auto;padding:24px;max-width:600px;background:white;border-radius:16px;font-family:system-ui;color:#8b1c1c"><h2>Timeless non è riuscito ad avviarsi</h2><p>Apri la Console (F12) per vedere il dettaglio tecnico.</p><pre style="white-space:pre-wrap"></pre></div>';
+        root.querySelector('pre').textContent = String(error);
+      }
+    })();
+  </script>
+</body>
+</html>
